@@ -30,9 +30,9 @@ return {
     return {
       -- Basic debugging keymaps, feel free to change to your liking!
       { '<F5>', dap.continue, desc = 'Debug: Start/Continue' },
-      { '<F1>', dap.step_into, desc = 'Debug: Step Into' },
-      { '<F2>', dap.step_over, desc = 'Debug: Step Over' },
-      { '<F3>', dap.step_out, desc = 'Debug: Step Out' },
+      { '<F11>', dap.step_into, desc = 'Debug: Step Into' },
+      { '<F10>', dap.step_over, desc = 'Debug: Step Over' },
+      { '<F12>', dap.step_out, desc = 'Debug: Step Out' },
       { '<leader>b', dap.toggle_breakpoint, desc = 'Debug: Toggle Breakpoint' },
       {
         '<leader>B',
@@ -66,7 +66,9 @@ return {
         'delve',
       },
     }
-
+    vim.keymap.set('n', '<space>?', function()
+      require('dapui').eval(nil, { enter = true })
+    end)
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
     dapui.setup {
