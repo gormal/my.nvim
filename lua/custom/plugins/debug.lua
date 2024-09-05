@@ -76,11 +76,8 @@ return {
     dap.listeners.after.event_initialized['dapui_config'] = dapui.open
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close
-
-    vim.fn.sign_define('DapBreakpoint', { text = '🟥', texthl = '', linehl = '', numhl = '' })
-    vim.fn.sign_define('DapStopped', { text = '▶️', texthl = '', linehl = '', numhl = '' })
-
-    -- Install golang specific config
+    vim.fn.sign_define('DapBreakpoint', { text = '', texthl = 'Error', linhl = '', numhl = '' })
+    vim.fn.sign_define('DapStopped', { text = '▶', texthl = 'Error', linehl = 'Visual', numhl = 'DapStopped' })
     require('dap-go').setup {
       delve = {
         -- On Windows delve must be run attached or it crashes.
