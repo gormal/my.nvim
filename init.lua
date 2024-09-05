@@ -2,7 +2,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- Netrw settings
 vim.g.netrw_liststyle = 3
@@ -80,7 +80,7 @@ vim.opt.scrolloff = 10
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
-
+vim.keymap.set('n', '.', ';', { desc = 'use > as a way to move forward', noremap = true, silent = true })
 vim.keymap.set('n', '<leader>pv', ':Ex<CR>', { desc = 'Open netrw', noremap = true, silent = true })
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
