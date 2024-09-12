@@ -64,6 +64,7 @@ return {
       ensure_installed = {
         -- Update this to ensure that you have the debuggers for the langs you want
         'delve',
+        'coreclr',
       },
     }
     vim.keymap.set('n', '<space>?', function()
@@ -83,6 +84,73 @@ return {
         -- On Windows delve must be run attached or it crashes.
         -- See https://github.com/leoluz/nvim-dap-go/blob/main/README.md#configuring
         detached = vim.fn.has 'win32' == 0,
+      },
+    }
+
+    local function get_dll()
+      return coroutine.create(function(dap_run_co)
+        local items = vim.fn.globpath(vim.fn.getcwd(), '**/bin/Debug/**/*.dll', 0, 1)
+        local opts = {
+          format_item = function(path)
+            return vim.fn.fnamemodify(path, ':t')
+          end,
+        }
+        local function cont(choice)
+          if choice == nil then
+            return nil
+          else
+            coroutine.resume(dap_run_co, choice)
+          end
+        end
+
+        vim.ui.select(items, opts, cont)
+      end)
+    end
+
+    dap.configurations.cs = {
+      {
+        type = 'coreclr',
+        name = 'Launch - NetCoreDbg - with args',
+        request = 'launch',
+        program = get_dll,
+        args = function()
+          local input = vim.fn.input('Command-line arguments: ', '')
+
+          -- Use a more robust approach to split the arguments while respecting quoted strings
+          local args = {}
+          local in_quote = false
+          local current_arg = ''
+
+          for i = 1, #input do
+            local char = input:sub(i, i)
+            if char == '"' then
+              in_quote = not in_quote -- Toggle quote state
+            elseif char == ' ' and not in_quote then
+              if current_arg ~= '' then
+                table.insert(args, current_arg)
+                current_arg = ''
+              end
+            else
+              current_arg = current_arg .. char
+            end
+          end
+
+          -- Add the last argument
+          if current_arg ~= '' then
+            table.insert(args, current_arg)
+          end
+
+          return args
+        end,
+        cwd = '${workspaceFolder}', -- Set current working directory
+        stopAtEntry = false,
+      },
+      {
+        type = 'coreclr',
+        name = 'Launch - NetCoreDbg',
+        request = 'launch',
+        cwd = '${workspaceFolder}', -- Set current working directory
+        stopAtEntry = false,
       },
     }
   end,
