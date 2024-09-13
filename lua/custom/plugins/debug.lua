@@ -49,6 +49,7 @@ return {
   config = function()
     local dap = require 'dap'
     local dapui = require 'dapui'
+    local dap_utils = require 'dap.utils'
 
     require('mason-nvim-dap').setup {
       -- Makes a best effort to setup the various debuggers with
@@ -146,11 +147,10 @@ return {
         stopAtEntry = false,
       },
       {
+        name = 'Build and attach - .NET',
+        request = 'attach',
         type = 'coreclr',
-        name = 'Launch - NetCoreDbg',
-        request = 'launch',
-        cwd = '${workspaceFolder}', -- Set current working directory
-        stopAtEntry = false,
+        processId = dap_utils.pick_process,
       },
     }
   end,
