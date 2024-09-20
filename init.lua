@@ -85,7 +85,11 @@ vim.keymap.set('n', '<leader>pv', ':Ex<CR>', { desc = 'Open netrw', noremap = tr
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+-- Remap <C-d> for half-page down and center
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { noremap = true, silent = true })
 
+-- Remap <C-b> for half-page up and center
+vim.keymap.set('n', '<C-b>', '<C-b>zz', { noremap = true, silent = true })
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
@@ -180,7 +184,12 @@ require('lazy').setup({
       },
     },
   },
-
+  {
+    'Issafalcon/lsp-overloads.nvim',
+    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+    config = function() -- This is the function that runs, AFTER loading
+    end,
+  },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -506,6 +515,20 @@ require('lazy').setup({
             })
           end
 
+          --- Guard against servers without the signatureHelper capability
+          if client and client.server_capabilities.signatureHelpProvider then
+            require('lsp-overloads').setup(client, {
+              ui = {
+                floating_window_above_cur_line = true,
+                max_width = math.floor(vim.api.nvim_win_get_width(0) / 2),
+                highlight = {
+                  italic = true,
+                  bold = true,
+                  fg = '#ffffff',
+                },
+              },
+            })
+          end
           -- The following code creates a keymap to toggle inlay hints in your
           -- code, if the language server you are using supports them
           --
@@ -849,7 +872,31 @@ require('lazy').setup({
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
+  {
+    'MoaidHathot/dotnet.nvim',
+    ft = { 'cs', 'fs', 'csproj' }, -- Load for .NET-related file types
+    opts = {},
+    keys = function(_, keys)
+      -- Adding a new item (Project/globaljson/sln, any template installed)
+      -- vim.keymap.set('n', '<leader>nf', ':DotnetUI new_item<CR>', { noremap = true, silent = true, desc = "Add new .NET item" })
 
+      -- Bootstrapping a new C# file
+      -- vim.keymap.set('n', '<leader>db', ':DotnetUI file bootstrap<CR>', { noremap = true, silent = true, desc = "Bootstrap new C# file" })
+
+      -- Adding a NuGet package
+      vim.keymap.set('n', '<leader>ppa', ':DotnetUI project package add<CR>', { noremap = true, silent = true, desc = 'Add NuGet package' })
+
+      -- Removing a NuGet package
+      vim.keymap.set('n', '<leader>ppr', ':DotnetUI project package remove<CR>', { noremap = true, silent = true, desc = 'Remove NuGet package' })
+
+      -- Adding a project reference
+      vim.keymap.set('n', '<leader>pra', ':DotnetUI project reference add<CR>', { noremap = true, silent = true, desc = 'Add project reference' })
+      -- Removing a project reference
+      vim.keymap.set('n', '<leader>prr', ':DotnetUI project reference remove<CR>', { noremap = true, silent = true, desc = 'Remove project reference' })
+    end,
+  },
+
+  -- Set the keymap to call the toggle function
   -- { 'akinsho/toggleterm.nvim', version = '*', opts = {} },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
