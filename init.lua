@@ -812,6 +812,7 @@ require('lazy').setup({
 
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
     config = function()
       -- Better Around/Inside textobjects
       --
@@ -819,7 +820,23 @@ require('lazy').setup({
       --  - va)  - [V]isually select [A]round [)]paren
       --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
       --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
+      require('mini.ai').setup {
+        n_lines = 500,
+        custom_textobjects = {
+          f = function()
+            local ts = require 'nvim-treesitter.textobjects.select'
+            ts.select_textobject '@function.outer'
+          end,
+          p = function()
+            local ts = require 'nvim-treesitter.textobjects.select'
+            ts.select_textobject '@parameter.outer' -- Select entire parameter list
+          end,
+          i = function()
+            local ts = require 'nvim-treesitter.textobjects.select'
+            ts.select_textobject '@parameter.inner' -- Select individual parameter
+          end,
+        },
+      }
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
@@ -864,6 +881,17 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      textobjects = {
+        select = {
+          enable = true,
+          lookahead = true, -- Automatically jump forward to the text object
+          keymaps = {
+            -- You can set up your keymaps here
+            ['af'] = '@function.outer',
+            ['if'] = '@function.inner',
+          },
+        },
+      },
     },
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
